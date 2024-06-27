@@ -37,7 +37,7 @@ app.use('/api/ratings', ratingRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/payments', paymentRoutes);
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, async () => {
   await connectDB();
   `Server is listening on PORT ${PORT}`;
