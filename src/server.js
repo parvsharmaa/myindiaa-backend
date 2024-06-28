@@ -6,8 +6,10 @@ const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const { connectDB } = require('./config/db');
 const { validate } = require('./middlewares/validation');
-// const fs = require('fs');
-// const https = require('https');
+
+const fs = require('fs');
+const path = require('path');
+const https = require('https');
 
 const authRoutes = require('./routes/auth.route');
 const userRoutes = require('./routes/user.route');
@@ -62,18 +64,23 @@ app.get('/', (req, res) => {
 });
 
 // SSL/TLS setup
-// const sslOptions = {
-// key: fs.readFileSync(process.env.SSL_KEY_PATH),
-// cert: fs.readFileSync(process.env.SSL_CERT_PATH),
-// };
+let sslOptions;
+try {
+  sslOptions = {
+    key: fs.readFileSync(path.join(__dirname, '../cert', 'key.pem')),
+    cert: fs.readFileSync(path.join(__dirname, '../cert', 'cert.pem')),
+  };
+} catch (error) {
+  console.error('Error reading SSL key or certificate:', error.message);
+  process.exit(1);
+}
+
+const server = https.createServer(sslOptions, app);
 
 const PORT = process.env.PORT || 5001;
-
-// const server = https.createServer(sslOptions, app);
-
-app.listen(PORT, async () => {
+server.listen(PORT, async () => {
   await connectDB();
-  console.log(`Server is listening on PORT ${PORT}`);
+  console.log(`Server is listening on PORT ${PORT} 🚀`);
 });
 
 module.exports = app;
